@@ -1,6 +1,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { logoPieces } from '../components/LogoMark'
+import { logoPieces, LOGO_WIDTH, LOGO_HEIGHT } from '../components/LogoMark'
 import { pieceBounds } from '../components/JourneyPieces'
 
 /* -------------------------------------------------------------------------- */
@@ -28,21 +28,75 @@ export type PieceItinerary = {
 }
 
 export const itineraries: PieceItinerary[] = [
-  { piece: 0, depth: 7, stops: [{ dock: 'philosophy-kicker' }, { dock: 'film-kicker' }, { dock: 'location-kicker' }] },
-  { piece: 1, depth: 6, stops: [{ dock: 'philosophy-arch', fit: 1.1 }, { dock: 'film-one', fit: 1.15 }] },
-  { piece: 2, depth: 5, stops: [{ dock: 'collection-kicker' }, { dock: 'film-two', fit: 1.15 }] },
-  { piece: 3, depth: 4, stops: [{ dock: 'card-0' }, { dock: 'team-0' }] },
-  { piece: 4, depth: 3, stops: [{ dock: 'card-1', mobile: false }, { dock: 'team-1' }] },
-  { piece: 5, depth: 2, stops: [{ dock: 'card-2', mobile: false }, { dock: 'team-2' }] },
-  { piece: 6, depth: 1, stops: [{ dock: 'card-3' }, { dock: 'team-kicker' }] },
+  {
+    piece: 0, // Top Diamond
+    depth: 7,
+    stops: [
+      { dock: 'philosophy-kicker' },
+      { dock: 'film-kicker' },
+      { dock: 'location-kicker' },
+    ],
+  },
+  {
+    piece: 1, // Top Parallelogram
+    depth: 6,
+    stops: [
+      { dock: 'philosophy-arch', fit: 1.1 },
+      { dock: 'film-one', fit: 1.15 },
+    ],
+  },
+  {
+    piece: 2, // Top Right Triangle
+    depth: 5,
+    stops: [
+      { dock: 'philosophy-sub' },
+      { dock: 'collection-kicker' },
+      { dock: 'film-two', fit: 1.15 },
+    ],
+  },
+  {
+    piece: 3, // Middle Left Triangle
+    depth: 4,
+    stops: [
+      { dock: 'note-0' },
+      { dock: 'card-0' },
+      { dock: 'team-0' },
+    ],
+  },
+  {
+    piece: 4, // Middle Horizontal Diamond
+    depth: 3,
+    stops: [
+      { dock: 'note-1' },
+      { dock: 'card-1', mobile: false },
+      { dock: 'team-1' },
+    ],
+  },
+  {
+    piece: 5, // Bottom Diamond
+    depth: 2,
+    stops: [
+      { dock: 'note-2' },
+      { dock: 'card-2', mobile: false },
+      { dock: 'team-2' },
+    ],
+  },
+  {
+    piece: 6, // Bottom Left Triangle
+    depth: 1,
+    stops: [
+      { dock: 'philosophy-link' },
+      { dock: 'card-3' },
+      { dock: 'team-kicker' },
+    ],
+  },
 ]
 
 /* -------------------------------------------------------------------------- */
 /*  Geometry                                                                   */
 /* -------------------------------------------------------------------------- */
 
-/** The LogoMark viewBox ("24 0 280 338"); fragment coordinates live in this space. */
-const LOGO_VIEWBOX = { x: 24, w: 280 }
+const LOGO_VIEWBOX = { x: 0, w: LOGO_WIDTH, h: LOGO_HEIGHT }
 
 type Point = { x: number; y: number; scale: number; rotation: number }
 type Waypoint = Point & { dock: string; arrive: number; leave: number }
@@ -73,7 +127,7 @@ const offsetDocRect = (el: HTMLElement): DocRect => {
   return { x, y, w: el.offsetWidth, h: el.offsetHeight }
 }
 
-/** Document-space box via bounding rect (for SVG marks, which lack offset geometry). */
+/** Document-space box via bounding rect (for SVG/image marks). */
 const rectDocRect = (el: Element): DocRect => {
   const r = el.getBoundingClientRect()
   return { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height }
@@ -83,13 +137,13 @@ const rectDocRect = (el: Element): DocRect => {
 const pieceOverMark = (mark: DocRect, index: number, rotation = 0): Point => {
   const s = mark.w / LOGO_VIEWBOX.w
   const b = pieceBounds[index]
-  return { x: mark.x + (b.minX - LOGO_VIEWBOX.x) * s, y: mark.y + b.minY * s, scale: s, rotation }
+  return { x: mark.x + b.minX * s, y: mark.y + b.minY * s, scale: s, rotation }
 }
 
 /** Where piece `index` must sit to be centred in (and sized to) a dock slot. */
 const pieceInSlot = (slot: DocRect, index: number, stop: DockStop): Point => {
   const b = pieceBounds[index]
-  const s = (Math.max(slot.w, slot.h) * (stop.fit ?? 1.3)) / Math.max(b.w, b.h)
+  const s = (Math.max(slot.w, slot.h) * (stop.fit ?? 1.15)) / Math.max(b.w, b.h)
   return {
     x: slot.x + slot.w / 2 - (b.w * s) / 2,
     y: slot.y + slot.h / 2 - (b.h * s) / 2,
@@ -114,7 +168,7 @@ type Segment = {
   drift: number
 }
 
-const arriveEase = gsap.parseEase('back.out(1.25)')
+const arriveEase = gsap.parseEase('back.out(1.2)')
 const assembleEase = gsap.parseEase('power2.inOut')
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
@@ -123,7 +177,7 @@ const toSegments = (plan: PiecePlan): Segment[] => {
   const direction = plan.piece % 2 ? -1 : 1
   const segments: Segment[] = []
   let from = plan.origin
-  let cursor = 0.03 + plan.piece * 0.012
+  let cursor = 0.02 + plan.piece * 0.006
 
   plan.waypoints.forEach((wp, k) => {
     segments.push({
@@ -132,8 +186,8 @@ const toSegments = (plan: PiecePlan): Segment[] => {
       start: cursor,
       end: wp.arrive,
       ease: arriveEase,
-      spin: direction * (120 + k * 40),
-      drift: direction * (36 + plan.piece * 6),
+      spin: direction * (40 + k * 15),
+      drift: direction * (18 + plan.piece * 4),
     })
     from = wp
     cursor = wp.leave
@@ -145,8 +199,8 @@ const toSegments = (plan: PiecePlan): Segment[] => {
     start: cursor,
     end: plan.final.arrive,
     ease: assembleEase,
-    spin: direction * 90,
-    drift: direction * 24,
+    spin: direction * 45,
+    drift: direction * 14,
   })
   return segments
 }
@@ -180,15 +234,11 @@ export type JourneyOptions = { mobile: boolean }
 
 /**
  * Creates the scroll-driven logo journey inside `root` and returns a cleanup.
- *
- * One ScrollTrigger supplies progress; every fragment's state is computed from
- * its cached itinerary for that progress. Layout changes only re-measure the
- * plans, so forward/backward scrolling and rebuilds can never desynchronise.
  */
 export function createLogoJourney(root: HTMLElement, { mobile }: JourneyOptions): () => void {
-  const pieces = Array.from(root.querySelectorAll<SVGSVGElement>('.journey-piece'))
-  const heroMark = root.querySelector<SVGSVGElement>('.v2-hero__mark')
-  const finalMark = root.querySelector<SVGSVGElement>('.v2-reassembly__mark')
+  const pieces = Array.from(root.querySelectorAll<HTMLElement>('.journey-piece'))
+  const heroMark = root.querySelector<HTMLElement>('.v2-hero__mark')
+  const finalMark = root.querySelector<HTMLElement>('.v2-reassembly__mark')
   const mapEl = root.querySelector<HTMLElement>('.v2-location__map')
   const finalLabel = root.querySelector<HTMLElement>('.v2-reassembly span')
 
@@ -210,10 +260,10 @@ export function createLogoJourney(root: HTMLElement, { mobile }: JourneyOptions)
 
     // Journey spans page top → map centred in the viewport.
     endScroll = Math.max(1, map.y + map.h / 2 - vh / 2)
-    const toT = (scrollValue: number) => gsap.utils.clamp(0.02, 0.9, scrollValue / endScroll)
+    const toT = (scrollValue: number) => gsap.utils.clamp(0.015, 0.9, scrollValue / endScroll)
 
     plans = itineraries.map(({ piece, depth, stops }) => {
-      let cursor = 0.03 + piece * 0.012
+      let cursor = 0.02 + piece * 0.006
       const waypoints: Waypoint[] = []
 
       stops
@@ -223,8 +273,8 @@ export function createLogoJourney(root: HTMLElement, { mobile }: JourneyOptions)
           if (!slot) return
           const rect = offsetDocRect(slot)
           // Arrive as the slot enters the lower viewport; rest; leave as it passes the upper third.
-          const arrive = Math.max(toT(rect.y - vh * 0.8), cursor + 0.025)
-          const leave = Math.max(toT(rect.y - vh * 0.32), arrive + 0.03)
+          const arrive = Math.max(toT(rect.y - vh * 0.8), cursor + 0.015)
+          const leave = Math.max(toT(rect.y - vh * 0.32), arrive + 0.025)
           waypoints.push({ ...pieceInSlot(rect, piece, stop), dock: stop.dock, arrive, leave })
           cursor = leave
         })
@@ -234,7 +284,7 @@ export function createLogoJourney(root: HTMLElement, { mobile }: JourneyOptions)
         depth,
         origin: pieceOverMark(hero, piece),
         waypoints,
-        final: { ...pieceOverMark(finalRect, piece), arrive: Math.max(0.93 + piece * 0.006, cursor + 0.02) },
+        final: { ...pieceOverMark(finalRect, piece), arrive: Math.max(0.93 + piece * 0.005, cursor + 0.02) },
       }
       return { plan, segments: toSegments(plan) }
     })
@@ -242,10 +292,10 @@ export function createLogoJourney(root: HTMLElement, { mobile }: JourneyOptions)
 
   /* ---- Render phase (no layout reads) ----------------------------------- */
   const setters = pieces.map((el) => ({
-    x: gsap.quickTo(el, 'x', { duration: 0.55, ease: 'power3.out' }),
-    y: gsap.quickTo(el, 'y', { duration: 0.55, ease: 'power3.out' }),
-    scale: gsap.quickTo(el, 'scale', { duration: 0.55, ease: 'power3.out' }),
-    rotation: gsap.quickTo(el, 'rotation', { duration: 0.55, ease: 'power3.out' }),
+    x: gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' }),
+    y: gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' }),
+    scale: gsap.quickTo(el, 'scale', { duration: 0.5, ease: 'power3.out' }),
+    rotation: gsap.quickTo(el, 'rotation', { duration: 0.5, ease: 'power3.out' }),
   }))
 
   const render = (progress: number, immediate = false) => {

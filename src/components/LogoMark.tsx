@@ -1,9 +1,119 @@
-import { useId } from 'react'
+import React from 'react'
+
+export interface LogoPieceData {
+  index: number
+  name: string
+  src: string
+  minX: number
+  minY: number
+  w: number
+  h: number
+  relX: number
+  relY: number
+  relW: number
+  relH: number
+}
+
+export const LOGO_WIDTH = 262
+export const LOGO_HEIGHT = 343
+
+export const logoPieces: LogoPieceData[] = [
+  {
+    index: 0,
+    name: 'Top Diamond',
+    src: '/assets/logo-pieces/piece-0.png',
+    minX: 0,
+    minY: 2,
+    w: 95,
+    h: 136,
+    relX: 0 / 262,
+    relY: 2 / 343,
+    relW: 95 / 262,
+    relH: 136 / 343,
+  },
+  {
+    index: 1,
+    name: 'Top Parallelogram',
+    src: '/assets/logo-pieces/piece-1.png',
+    minX: 68,
+    minY: 0,
+    w: 128,
+    h: 62,
+    relX: 68 / 262,
+    relY: 0 / 343,
+    relW: 128 / 262,
+    relH: 62 / 343,
+  },
+  {
+    index: 2,
+    name: 'Top Right Triangle',
+    src: '/assets/logo-pieces/piece-2.png',
+    minX: 156,
+    minY: 0,
+    w: 106,
+    h: 61,
+    relX: 156 / 262,
+    relY: 0 / 343,
+    relW: 106 / 262,
+    relH: 61 / 343,
+  },
+  {
+    index: 3,
+    name: 'Middle Left Triangle',
+    src: '/assets/logo-pieces/piece-3.png',
+    minX: 0,
+    minY: 94,
+    w: 40,
+    h: 98,
+    relX: 0 / 262,
+    relY: 94 / 343,
+    relW: 40 / 262,
+    relH: 98 / 343,
+  },
+  {
+    index: 4,
+    name: 'Middle Horizontal Diamond',
+    src: '/assets/logo-pieces/piece-4.png',
+    minX: 60,
+    minY: 106,
+    w: 131,
+    h: 70,
+    relX: 60 / 262,
+    relY: 106 / 343,
+    relW: 131 / 262,
+    relH: 70 / 343,
+  },
+  {
+    index: 5,
+    name: 'Bottom Diamond',
+    src: '/assets/logo-pieces/piece-5.png',
+    minX: 0,
+    minY: 144,
+    w: 99,
+    h: 147,
+    relX: 0 / 262,
+    relY: 144 / 343,
+    relW: 99 / 262,
+    relH: 147 / 343,
+  },
+  {
+    index: 6,
+    name: 'Bottom Left Triangle',
+    src: '/assets/logo-pieces/piece-6.png',
+    minX: 0,
+    minY: 246,
+    w: 40,
+    h: 97,
+    relX: 0 / 262,
+    relY: 246 / 343,
+    relW: 40 / 262,
+    relH: 97 / 343,
+  },
+]
 
 type LogoMarkProps = {
   className?: string
   title?: string
-  animated?: boolean
 }
 
 type LogoPieceProps = {
@@ -14,72 +124,36 @@ type LogoPieceProps = {
   opacity?: number
 }
 
-export const logoPieces = [
-  { points: '84,10 120,64 84,122 50,64', tone: 'light' },
-  { points: '102,10 176,10 220,62 154,62', tone: 'mid' },
-  { points: '190,10 284,10 226,62', tone: 'light' },
-  { points: '50,82 78,122 50,164', tone: 'mid' },
-  { points: '84,132 154,96 214,132 154,168', tone: 'light' },
-  { points: '84,142 124,210 84,278 44,210', tone: 'mid' },
-  { points: '50,242 78,282 50,324', tone: 'dark' },
-]
-
 export function LogoMark({
   className = '',
   title = 'FINO Jewellery geometric F logo',
-  animated = false,
 }: LogoMarkProps) {
-  const id = useId().replace(/:/g, '')
-
   return (
-    <svg
+    <div
       className={`logo-mark ${className}`}
-      viewBox="24 0 280 338"
       role="img"
       aria-label={title}
-      data-animated={animated ? 'true' : 'false'}
+      style={{
+        position: 'relative',
+        display: 'inline-block',
+        aspectRatio: `${LOGO_WIDTH} / ${LOGO_HEIGHT}`,
+        width: '100%',
+        maxWidth: '120px',
+      }}
     >
-      <defs>
-        <linearGradient id={`${id}-light`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fff0a8" />
-          <stop offset=".25" stopColor="#e6bb54" />
-          <stop offset=".58" stopColor="#b77a18" />
-          <stop offset=".78" stopColor="#f4d67b" />
-          <stop offset="1" stopColor="#996213" />
-        </linearGradient>
-        <linearGradient id={`${id}-mid`} x1=".15" y1="0" x2=".85" y2="1">
-          <stop offset="0" stopColor="#c38f2b" />
-          <stop offset=".42" stopColor="#f2cf70" />
-          <stop offset=".62" stopColor="#b87818" />
-          <stop offset="1" stopColor="#e5b748" />
-        </linearGradient>
-        <linearGradient id={`${id}-dark`} x1="0" y1="0" x2="1" y2=".5">
-          <stop offset="0" stopColor="#8f5d13" />
-          <stop offset=".52" stopColor="#dba93c" />
-          <stop offset="1" stopColor="#f6df91" />
-        </linearGradient>
-        <filter id={`${id}-glow`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <g className="logo-mark__pieces" filter={`url(#${id}-glow)`}>
-        {logoPieces.map((piece, index) => (
-          <polygon
-            key={piece.points}
-            className="logo-piece"
-            data-piece={index}
-            points={piece.points}
-            fill={`url(#${id}-${piece.tone})`}
-            stroke="#f5dc88"
-            strokeWidth="0.75"
-          />
-        ))}
-      </g>
-    </svg>
+      <img
+        src="/assets/fino-logo-clean.png"
+        alt={title}
+        className="logo-mark__image"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          display: 'block',
+          filter: 'drop-shadow(0 6px 20px rgba(197, 160, 89, 0.35))',
+        }}
+      />
+    </div>
   )
 }
 
@@ -90,63 +164,27 @@ export function LogoPiece({
   rotation = 0,
   opacity = 1,
 }: LogoPieceProps) {
-  const id = useId().replace(/:/g, '')
   const piece = logoPieces[index]
   if (!piece) return null
 
-  // Compute tight bounding box from the polygon points
-  const nums = piece.points.split(/[ ,]+/).map(Number)
-  const xs = nums.filter((_, i) => i % 2 === 0)
-  const ys = nums.filter((_, i) => i % 2 === 1)
-  const minX = Math.min(...xs)
-  const minY = Math.min(...ys)
-  const w = Math.max(...xs) - minX
-  const h = Math.max(...ys) - minY
-
-  const gradId = `${id}-${piece.tone}`
-
   return (
-    <svg
+    <img
+      src={piece.src}
       className={`logo-piece-solo ${className}`}
-      viewBox={`${minX} ${minY} ${w} ${h}`}
       width={size}
-      height={size * (h / w)}
-      style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined, opacity }}
+      height={size * (piece.h / piece.w)}
+      style={{
+        width: `${size}px`,
+        height: `${size * (piece.h / piece.w)}px`,
+        transform: rotation ? `rotate(${rotation}deg)` : undefined,
+        opacity,
+        objectFit: 'contain',
+        display: 'inline-block',
+      }}
+      alt=""
       aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        {piece.tone === 'light' && (
-          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#fff0a8" />
-            <stop offset=".25" stopColor="#e6bb54" />
-            <stop offset=".58" stopColor="#b77a18" />
-            <stop offset=".78" stopColor="#f4d67b" />
-            <stop offset="1" stopColor="#996213" />
-          </linearGradient>
-        )}
-        {piece.tone === 'mid' && (
-          <linearGradient id={gradId} x1=".15" y1="0" x2=".85" y2="1">
-            <stop offset="0" stopColor="#c38f2b" />
-            <stop offset=".42" stopColor="#f2cf70" />
-            <stop offset=".62" stopColor="#b87818" />
-            <stop offset="1" stopColor="#e5b748" />
-          </linearGradient>
-        )}
-        {piece.tone === 'dark' && (
-          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2=".5">
-            <stop offset="0" stopColor="#8f5d13" />
-            <stop offset=".52" stopColor="#dba93c" />
-            <stop offset="1" stopColor="#f6df91" />
-          </linearGradient>
-        )}
-      </defs>
-      <polygon
-        points={piece.points}
-        fill={`url(#${gradId})`}
-        stroke="#f5dc88"
-        strokeWidth="1"
-      />
-    </svg>
+    />
   )
 }
+
+export default LogoMark

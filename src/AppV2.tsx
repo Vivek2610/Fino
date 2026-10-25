@@ -97,19 +97,28 @@ function Philosophy() {
                 </div>
                 <h2 id="philosophy-title">
                     Born from bold form,
-                    <em>Sculpted in Gold</em>
+                    <em>Sculpted in Gold <Dock name="philosophy-sub" /></em>
                 </h2>
                 <p>
                     An architectural dialogue between faceted gold, vivid emerald tones,
                     and a distinctly individual point of view.
                 </p>
                 <div className="design-notes">
-                    <span><b>01</b> Form</span>
-                    <span><b>02</b> Light</span>
-                    <span><b>03</b> Character</span>
+                    <span>
+                        <Dock name="note-0" />
+                        <b>01</b> Form
+                    </span>
+                    <span>
+                        <Dock name="note-1" />
+                        <b>02</b> Light
+                    </span>
+                    <span>
+                        <Dock name="note-2" />
+                        <b>03</b> Character
+                    </span>
                 </div>
                 <a className="v2-underlined-link" href="#film">
-                    Discover the FINO philosophy <ArrowRight />
+                    <Dock name="philosophy-link" /> Discover the FINO philosophy <ArrowRight />
                 </a>
             </div>
         </section>
